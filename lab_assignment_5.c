@@ -1,76 +1,124 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct node {
-	char letter;
-	struct node* next;
+typedef struct node
+{
+    char letter;
+    struct node *next;
 } node;
 
 // Returns number of nodes in the linkedList.
-int length(node* head)
+int length(node *head)
 {
-   struct node *tmp = head;
-    int len = 0;
-   while (tmp != NULL)
-   {
-      tmp = tmp->next;
-      len++;
-   }
-
-   return (len);
+    int nodeCount = 0;
+    while (head != NULL)
+    {
+        // add 1 for node Count.
+        nodeCount++;
+        head = head->next;
+    }
+    return nodeCount;
 }
 
 // parses the string in the linkedList
 //  if the linked list is head -> |a|->|b|->|c|
 //  then toCString function wil return "abc"
-char* toCString(node* head)
+char *toCString(node *head)
 {
+    char *cString = (char *)malloc((((length(head))) + 1) * sizeof(char));
+    if (cString == NULL)
+    {
+        exit(-1);
+    }
+
+    int i = 0;
+    while (head != NULL)
+    {
+        cString[i++] = head->letter;
+        head = head->next;
+    }
+    cString[i] = '\0';
+    return cString;
 }
 
 // inserts character to the linkedlist
 // f the linked list is head -> |a|->|b|->|c|
 // then insertChar(&head, 'x') will update the linked list as foolows:
 // head -> |a|->|b|->|c|->|x|
-void insertChar(node** pHead, char c)
+void insertChar(node **pHead, char c)
 {
+    // Malloc data in the linked list
+    node *characterData = (node *)malloc(sizeof(node));
+    if (characterData == NULL)
+    {
+        exit(-2);
+    }
+    characterData->letter = c;
+    characterData->next = NULL;
+
+    if (*pHead == NULL)
+    {
+        *pHead = characterData;
+    }
+    else
+    {
+        node *temp = *pHead;
+
+        while (characterData->next != NULL)
+        {
+            temp = temp->next;
+        }
+        temp->next = characterData;
+    }
 }
 
 // deletes all nodes in the linkedList.
-void deleteList(node** pHead)
+void deleteList(node **pHead)
 {
+    // establish temporary variable to update head for loop
+    node *temp = *pHead;
+    // declaring next in function
+    node *next;
+
+    while (temp != NULL)
+    {
+        free(temp);
+        temp = next;
+    }
+    *pHead = NULL;
 }
 
 int main(void)
 {
-	int i, strLen, numInputs;
-	node* head = NULL;
-	char* str;
-	char c;
-	FILE* inFile = fopen("input.txt","r");
+    int i, strLen, numInputs;
+    node *head = NULL;
+    char *str;
+    char c;
+    FILE *inFile = fopen("input.txt", "r");
 
-	fscanf(inFile, " %d\n", &numInputs);
-	
-	while (numInputs-- > 0)
-	{
-		fscanf(inFile, " %d\n", &strLen);
-		for (i = 0; i < strLen; i++)
-		{
-			fscanf(inFile," %c", &c);
-			insertChar(&head, c);
-		}
+    fscanf(inFile, " %d\n", &numInputs);
 
-		str = toCString(head);
-		printf("String is : %s\n", str);
+    while (numInputs-- > 0)
+    {
+        fscanf(inFile, " %d\n", &strLen);
+        for (i = 0; i < strLen; i++)
+        {
+            fscanf(inFile, " %c", &c);
+            insertChar(&head, c);
+        }
 
-		free(str);
-		deleteList(&head);
+        str = toCString(head);
+        printf("String is : %s\n", str);
 
-		if (head != NULL)
-		{
-			printf("deleteList is not correct!");
-			break;
-		}
-	}
+        free(str);
+        deleteList(&head);
 
-	fclose(inFile);
+        if (head != NULL)
+        {
+            printf("deleteList is not correct!");
+            break;
+        }
+    }
+
+    fclose(inFile);
 }
